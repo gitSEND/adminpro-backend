@@ -6,16 +6,33 @@ var bodyParser = require('body-parser');
 //Inicializar variables
 var app = express();
 
+// Configurar cabeceras y cors
+app.use((req, res, next) => {
+	res.header('Access-Control-Allow-Origin', '*');
+	res.header(
+		'Access-Control-Allow-Headers',
+		'Authorization, X-API-KEY, Origin, X-Requested-With, Content-Type, Accept, Access-Control-Allow-Request-Method'
+	);
+	res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE');
+	res.header('Allow', 'GET, POST, OPTIONS, PUT, DELETE');
+	next();
+});
+
 //Body-Parser
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 //Conexion a la base de datos
-mongoose.connection.openUri('mongodb://localhost:27017/hospitalDB', (err, res) => {
-	if (err) throw err;
-	console.log('Base de datos online');
-});
+mongoose.connect(
+	'mongodb://localhost:27017/hospitalDB',
+	{ useNewUrlParser: true, useUnifiedTopology: true },
+	(err, res) => {
+		if (err) throw err;
+		console.log('Base de datos online');
+	}
+);
+mongoose.set('useCreateIndex', true);
 
 //Importar Rutas
 var appRoutes = require('./routes/app.routes');
